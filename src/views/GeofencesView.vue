@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import L from 'leaflet'
 import 'leaflet-draw'
+import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import { LMap, LTileLayer } from '@vue-leaflet/vue-leaflet'
 import Button from 'primevue/button'
@@ -20,6 +21,12 @@ import {
   GEOFENCE_COLOR,
 } from '@/utils/geo'
 
+// leaflet-draw augments this Leaflet instance. Expose it as the global so
+// vue-leaflet (use-global-leaflet) builds the map on the SAME instance —
+// otherwise the draw control attaches to a different Leaflet and renders
+// detached from the map's control corner.
+;(window as unknown as { L: typeof L }).L = L
+
 const geofences = useGeofencesStore()
 const { list, loading } = storeToRefs(geofences)
 
@@ -32,9 +39,15 @@ const draftCoordinates = ref<[number, number][]>([])
 const saving = ref(false)
 
 function onMapReady(map: L.Map) {
+  // The map mounts inside a flex layout that settles after init; recompute
+  // its size on the next tick so tiles and controls lay out correctly.
+  nextTick(() => map.invalidateSize())
+
   const drawControl = new L.Control.Draw({
     draw: {
-      polygon: { allowIntersection: false, showArea: true },
+      // showArea:true triggers a readableArea ReferenceError in
+      // leaflet-draw 1.0.4 on Leaflet 1.9, so keep it off.
+      polygon: { allowIntersection: false, showArea: false },
       polyline: false,
       rectangle: false,
       circle: false,
@@ -80,7 +93,7 @@ onMounted(() => {
     <AppHeader />
     <main class="flex min-h-0 flex-1">
       <aside
-        class="flex w-72 flex-col border-r border-surface-800 bg-surface-900"
+        class="flex w-72 shrink-0 flex-col border-r border-surface-800 bg-surface-900"
       >
         <header class="border-b border-surface-800 px-4 py-3">
           <h2 class="text-sm font-semibold text-surface-100">Geofences</h2>
@@ -128,11 +141,11 @@ onMounted(() => {
         </div>
       </aside>
 
-      <div class="min-h-0 flex-1">
+      <div class="min-h-0 min-w-0 flex-1">
         <LMap
           :center="DEFAULT_MAP_CENTER"
           :zoom="DEFAULT_MAP_ZOOM"
-          :use-global-leaflet="false"
+          :use-global-leaflet="true"
           class="size-full"
           @ready="onMapReady"
         >

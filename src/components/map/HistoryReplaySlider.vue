@@ -36,7 +36,7 @@ const clock = (t: number) => (t ? format(new Date(t), 'HH:mm:ss') : '--:--:--')
 
 <template>
   <div
-    class="flex items-center gap-4 border-t border-surface-800 bg-surface-900/95 px-5 py-3 text-surface-200 backdrop-blur"
+    class="hidden items-center gap-4 border-t border-surface-800 bg-surface-900/95 px-5 py-3 text-surface-200 backdrop-blur md:flex"
   >
     <Button
       :icon="playing ? 'pi pi-pause' : 'pi pi-play'"

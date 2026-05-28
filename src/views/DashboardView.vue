@@ -5,19 +5,35 @@ import AppHeader from '@/components/layout/AppHeader.vue'
 import FleetMap from '@/components/map/FleetMap.vue'
 import VehicleSidebar from '@/components/sidebar/VehicleSidebar.vue'
 import HistoryReplaySlider from '@/components/map/HistoryReplaySlider.vue'
+import AlertToast from '@/components/alerts/AlertToast.vue'
 import { useVehiclesStore } from '@/stores/vehicles'
+import { useAlertsStore } from '@/stores/alerts'
 import { useAuthStore } from '@/stores/auth'
 import { useSocket } from '@/composables/useSocket'
 import { useVehicles } from '@/composables/useVehicles'
+import { useAlerts } from '@/composables/useAlerts'
 import { useHistoryReplay } from '@/composables/useHistoryReplay'
-import type { Vehicle } from '@/types/api'
+import type { Alert, Vehicle } from '@/types/api'
+import type { LatLngTuple } from '@/utils/geo'
 
 const vehicles = useVehiclesStore()
+const alerts = useAlertsStore()
 const { positioned, loading, error, selected, selectedId, selectedSpeedHistory } =
   storeToRefs(vehicles)
 
+const focusTarget = ref<LatLngTuple | null>(null)
+
 function onSelect(vehicle: Vehicle) {
   vehicles.select(vehicle.id)
+}
+
+function onAlertSelect(alert: Alert) {
+  const vehicle = vehicles.byId[alert.vehicleId]
+  vehicles.select(alert.vehicleId)
+  if (vehicle && vehicle.lastLat !== null && vehicle.lastLng !== null) {
+    // new tuple each time so the FleetMap focus watcher always re-fires
+    focusTarget.value = [vehicle.lastLat, vehicle.lastLng]
+  }
 }
 
 const auth = useAuthStore()
@@ -49,17 +65,20 @@ function closeReplay() {
 }
 
 let unbindVehicles: (() => void) | null = null
+let unbindAlerts: (() => void) | null = null
 
 onMounted(async () => {
-  await vehicles.fetchAll()
+  await Promise.all([vehicles.fetchAll(), alerts.fetchAll()])
   if (auth.token) {
     connect(auth.token)
     unbindVehicles = useVehicles()
+    unbindAlerts = useAlerts()
   }
 })
 
 onBeforeUnmount(() => {
   unbindVehicles?.()
+  unbindAlerts?.()
   disconnect()
   replay.clear()
 })
@@ -67,7 +86,8 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="flex h-screen flex-col bg-surface-950">
-    <AppHeader />
+    <AppHeader @alert-select="onAlertSelect" />
+    <AlertToast />
     <main class="relative flex min-h-0 flex-1">
       <div class="flex min-h-0 flex-1 flex-col">
         <div class="relative min-h-0 flex-1">
@@ -75,6 +95,7 @@ onBeforeUnmount(() => {
             :vehicles="positioned"
             :trail="showReplayOverlay ? replay.trail.value : []"
             :replay-position="showReplayOverlay ? replay.replayPosition.value : null"
+            :focus="focusTarget"
             @select="onSelect"
             @deselect="vehicles.deselect"
           />

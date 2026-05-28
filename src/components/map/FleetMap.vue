@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import 'leaflet/dist/leaflet.css'
+import { ref, watch } from 'vue'
+import type { Map as LeafletMap } from 'leaflet'
 import {
   LMap,
   LTileLayer,
@@ -14,13 +16,26 @@ import {
   type LatLngTuple,
 } from '@/utils/geo'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     vehicles: Vehicle[]
     trail?: LatLngTuple[]
     replayPosition?: LatLngTuple | null
+    focus?: LatLngTuple | null
   }>(),
-  { trail: () => [], replayPosition: null },
+  { trail: () => [], replayPosition: null, focus: null },
+)
+
+const mapRef = ref<{ leafletObject?: LeafletMap } | null>(null)
+
+// Pan/zoom to a vehicle when an alert (or other caller) requests focus.
+watch(
+  () => props.focus,
+  (target) => {
+    if (target && mapRef.value?.leafletObject) {
+      mapRef.value.leafletObject.flyTo(target, 15)
+    }
+  },
 )
 
 const emit = defineEmits<{
@@ -32,6 +47,7 @@ const emit = defineEmits<{
 <template>
   <div class="size-full">
     <LMap
+      ref="mapRef"
       :center="DEFAULT_MAP_CENTER"
       :zoom="DEFAULT_MAP_ZOOM"
       :use-global-leaflet="false"

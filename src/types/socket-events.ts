@@ -1,5 +1,5 @@
 // Typed Socket.io events mirroring API_CONTRACT.md §3.
-import type { VehicleStatus } from '@/types/api'
+import type { AlertSeverity, AlertType, VehicleStatus } from '@/types/api'
 
 export type ServiceStatus = 'connected' | 'disconnected'
 
@@ -12,14 +12,6 @@ export interface VehicleUpdatePayload {
   status: VehicleStatus
   timestamp: string
 }
-
-export type AlertType =
-  | 'speed_violation'
-  | 'geofence_exit'
-  | 'low_fuel'
-  | 'offline'
-
-export type AlertSeverity = 'low' | 'medium' | 'high'
 
 export interface AlertNewPayload {
   id: string

@@ -86,7 +86,7 @@ function logout() {
       </div>
 
       <div v-if="user" class="flex items-center gap-3">
-        <div class="text-right leading-tight">
+        <div class="hidden text-right leading-tight sm:block">
           <div class="text-sm text-surface-100">{{ user.email }}</div>
           <div class="text-xs capitalize text-surface-400">{{ user.role }}</div>
         </div>

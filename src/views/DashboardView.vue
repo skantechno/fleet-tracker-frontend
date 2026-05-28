@@ -70,7 +70,14 @@ function closeReplay() {
 let unbindVehicles: (() => void) | null = null
 let unbindAlerts: (() => void) | null = null
 
+function onKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && selectedId.value) {
+    vehicles.deselect()
+  }
+}
+
 onMounted(async () => {
+  window.addEventListener('keydown', onKeydown)
   await Promise.all([
     vehicles.fetchAll(),
     alerts.fetchAll(),
@@ -84,6 +91,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydown)
   unbindVehicles?.()
   unbindAlerts?.()
   disconnect()

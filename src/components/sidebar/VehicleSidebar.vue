@@ -34,7 +34,7 @@ const lastUpdate = computed(() =>
 
 <template>
   <aside
-    class="flex h-full w-80 flex-col gap-6 border-l border-surface-800 bg-surface-900 p-5 text-surface-100"
+    class="fixed inset-x-0 bottom-0 z-1000 flex max-h-[60vh] w-full flex-col gap-6 overflow-y-auto rounded-t-2xl border-t border-surface-800 bg-surface-900 p-5 text-surface-100 shadow-2xl md:static md:inset-auto md:max-h-none md:w-80 md:rounded-none md:border-l md:border-t-0 md:shadow-none"
   >
     <header class="flex items-start justify-between">
       <div>

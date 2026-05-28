@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import Skeleton from 'primevue/skeleton'
 import AlertItem from '@/components/alerts/AlertItem.vue'
 import { useAlertsStore } from '@/stores/alerts'
 import type { Alert } from '@/types/api'
@@ -22,8 +23,11 @@ const { list, loading } = storeToRefs(alerts)
     </header>
 
     <div class="min-h-0 flex-1 overflow-y-auto">
-      <div v-if="loading" class="px-3 py-6 text-center text-sm text-surface-500">
-        Loading…
+      <div v-if="loading" class="flex flex-col gap-3 px-3 py-3">
+        <div v-for="n in 4" :key="n" class="flex flex-col gap-1.5">
+          <Skeleton width="60%" height="0.9rem" />
+          <Skeleton width="90%" height="0.7rem" />
+        </div>
       </div>
       <div
         v-else-if="list.length === 0"

@@ -9,6 +9,7 @@ import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputtext'
 import SelectButton from 'primevue/selectbutton'
+import Skeleton from 'primevue/skeleton'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import GeofencePolygon from '@/components/map/GeofencePolygon.vue'
 import { useGeofencesStore } from '@/stores/geofences'
@@ -88,11 +89,8 @@ onMounted(() => {
           </p>
         </header>
         <div class="min-h-0 flex-1 overflow-y-auto">
-          <div
-            v-if="loading"
-            class="px-4 py-6 text-center text-sm text-surface-500"
-          >
-            Loading…
+          <div v-if="loading" class="flex flex-col gap-3 px-4 py-3">
+            <Skeleton v-for="n in 3" :key="n" height="2.5rem" />
           </div>
           <div
             v-else-if="list.length === 0"

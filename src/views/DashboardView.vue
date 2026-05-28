@@ -8,6 +8,7 @@ import HistoryReplaySlider from '@/components/map/HistoryReplaySlider.vue'
 import AlertToast from '@/components/alerts/AlertToast.vue'
 import { useVehiclesStore } from '@/stores/vehicles'
 import { useAlertsStore } from '@/stores/alerts'
+import { useGeofencesStore } from '@/stores/geofences'
 import { useAuthStore } from '@/stores/auth'
 import { useSocket } from '@/composables/useSocket'
 import { useVehicles } from '@/composables/useVehicles'
@@ -18,8 +19,10 @@ import type { LatLngTuple } from '@/utils/geo'
 
 const vehicles = useVehiclesStore()
 const alerts = useAlertsStore()
+const geofences = useGeofencesStore()
 const { positioned, loading, error, selected, selectedId, selectedSpeedHistory } =
   storeToRefs(vehicles)
+const { list: geofenceList } = storeToRefs(geofences)
 
 const focusTarget = ref<LatLngTuple | null>(null)
 
@@ -68,7 +71,11 @@ let unbindVehicles: (() => void) | null = null
 let unbindAlerts: (() => void) | null = null
 
 onMounted(async () => {
-  await Promise.all([vehicles.fetchAll(), alerts.fetchAll()])
+  await Promise.all([
+    vehicles.fetchAll(),
+    alerts.fetchAll(),
+    geofences.fetchAll(),
+  ])
   if (auth.token) {
     connect(auth.token)
     unbindVehicles = useVehicles()
@@ -93,6 +100,7 @@ onBeforeUnmount(() => {
         <div class="relative min-h-0 flex-1">
           <FleetMap
             :vehicles="positioned"
+            :geofences="geofenceList"
             :trail="showReplayOverlay ? replay.trail.value : []"
             :replay-position="showReplayOverlay ? replay.replayPosition.value : null"
             :focus="focusTarget"

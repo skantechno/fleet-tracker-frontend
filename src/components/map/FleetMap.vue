@@ -9,7 +9,8 @@ import {
   LCircleMarker,
 } from '@vue-leaflet/vue-leaflet'
 import VehicleMarker from '@/components/map/VehicleMarker.vue'
-import type { Vehicle } from '@/types/api'
+import GeofencePolygon from '@/components/map/GeofencePolygon.vue'
+import type { Geofence, Vehicle } from '@/types/api'
 import {
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
@@ -19,11 +20,12 @@ import {
 const props = withDefaults(
   defineProps<{
     vehicles: Vehicle[]
+    geofences?: Geofence[]
     trail?: LatLngTuple[]
     replayPosition?: LatLngTuple | null
     focus?: LatLngTuple | null
   }>(),
-  { trail: () => [], replayPosition: null, focus: null },
+  { geofences: () => [], trail: () => [], replayPosition: null, focus: null },
 )
 
 const mapRef = ref<{ leafletObject?: LeafletMap } | null>(null)
@@ -60,6 +62,12 @@ const emit = defineEmits<{
         name="OpenStreetMap"
         attribution="&copy; OpenStreetMap contributors"
       />
+      <GeofencePolygon
+        v-for="geofence in geofences"
+        :key="geofence.id"
+        :geofence="geofence"
+      />
+
       <VehicleMarker
         v-for="vehicle in vehicles"
         :key="vehicle.id"

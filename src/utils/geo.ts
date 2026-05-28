@@ -1,6 +1,11 @@
-import type { VehicleStatus } from '@/types/api'
+import type { GeofenceType, VehicleStatus } from '@/types/api'
 
 export type LatLngTuple = [number, number]
+
+export const GEOFENCE_COLOR: Record<GeofenceType, string> = {
+  allow: '#34d399', // emerald-400
+  deny: '#f87171', // red-400
+}
 
 export const DEFAULT_MAP_CENTER: LatLngTuple = [
   Number(import.meta.env.VITE_MAP_CENTER_LAT ?? 25.397),

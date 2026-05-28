@@ -31,6 +31,16 @@ export interface Alert {
   acknowledged: boolean
 }
 
+export type GeofenceType = 'allow' | 'deny'
+
+export interface Geofence {
+  id: string
+  name: string
+  // polygon vertices as [lat, lng] pairs
+  coordinates: [number, number][]
+  type: GeofenceType
+}
+
 export interface HistoryPoint {
   timestamp: string
   lat: number

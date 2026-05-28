@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import FleetMap from '@/components/map/FleetMap.vue'
 import { useVehiclesStore } from '@/stores/vehicles'
+import { useAuthStore } from '@/stores/auth'
+import { useSocket } from '@/composables/useSocket'
+import { useVehicles } from '@/composables/useVehicles'
 
 const vehicles = useVehiclesStore()
 const { positioned, loading, error } = storeToRefs(vehicles)
 
-onMounted(() => {
-  vehicles.fetchAll()
+const auth = useAuthStore()
+const { connect, disconnect } = useSocket()
+
+let unbindVehicles: (() => void) | null = null
+
+onMounted(async () => {
+  await vehicles.fetchAll()
+  if (auth.token) {
+    connect(auth.token)
+    unbindVehicles = useVehicles()
+  }
+})
+
+onBeforeUnmount(() => {
+  unbindVehicles?.()
+  disconnect()
 })
 </script>
 

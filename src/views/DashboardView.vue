@@ -3,13 +3,20 @@ import { onMounted, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import FleetMap from '@/components/map/FleetMap.vue'
+import VehicleSidebar from '@/components/sidebar/VehicleSidebar.vue'
 import { useVehiclesStore } from '@/stores/vehicles'
 import { useAuthStore } from '@/stores/auth'
 import { useSocket } from '@/composables/useSocket'
 import { useVehicles } from '@/composables/useVehicles'
+import type { Vehicle } from '@/types/api'
 
 const vehicles = useVehiclesStore()
-const { positioned, loading, error } = storeToRefs(vehicles)
+const { positioned, loading, error, selected, selectedSpeedHistory } =
+  storeToRefs(vehicles)
+
+function onSelect(vehicle: Vehicle) {
+  vehicles.select(vehicle.id)
+}
 
 const auth = useAuthStore()
 const { connect, disconnect } = useSocket()
@@ -33,21 +40,34 @@ onBeforeUnmount(() => {
 <template>
   <div class="flex h-screen flex-col bg-surface-950">
     <AppHeader />
-    <main class="relative min-h-0 flex-1">
-      <FleetMap :vehicles="positioned" />
+    <main class="relative flex min-h-0 flex-1">
+      <div class="relative min-h-0 flex-1">
+        <FleetMap
+          :vehicles="positioned"
+          @select="onSelect"
+          @deselect="vehicles.deselect"
+        />
 
-      <div
-        v-if="loading"
-        class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-surface-900/90 px-4 py-1.5 text-sm text-surface-300 shadow"
-      >
-        Loading fleet…
+        <div
+          v-if="loading"
+          class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-surface-900/90 px-4 py-1.5 text-sm text-surface-300 shadow"
+        >
+          Loading fleet…
+        </div>
+        <div
+          v-else-if="error"
+          class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-red-900/90 px-4 py-1.5 text-sm text-red-100 shadow"
+        >
+          {{ error }}
+        </div>
       </div>
-      <div
-        v-else-if="error"
-        class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-red-900/90 px-4 py-1.5 text-sm text-red-100 shadow"
-      >
-        {{ error }}
-      </div>
+
+      <VehicleSidebar
+        v-if="selected"
+        :vehicle="selected"
+        :samples="selectedSpeedHistory"
+        @close="vehicles.deselect"
+      />
     </main>
   </div>
 </template>

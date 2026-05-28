@@ -7,7 +7,10 @@ import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from '@/utils/geo'
 
 defineProps<{ vehicles: Vehicle[] }>()
 
-const emit = defineEmits<{ select: [vehicle: Vehicle] }>()
+const emit = defineEmits<{
+  select: [vehicle: Vehicle]
+  deselect: []
+}>()
 </script>
 
 <template>
@@ -17,6 +20,7 @@ const emit = defineEmits<{ select: [vehicle: Vehicle] }>()
       :zoom="DEFAULT_MAP_ZOOM"
       :use-global-leaflet="false"
       class="size-full"
+      @click="emit('deselect')"
     >
       <LTileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

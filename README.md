@@ -50,6 +50,28 @@ Opens at `http://localhost:5173`.
 - **Alert toasts + panel** for speed violations, geofence exits, low fuel
 - **Geofence drawing** (admin) with polygon tools on the map
 - **Connection status badge** showing MQTT + Socket.io health
+- **Responsive layout** — the vehicle panel becomes a bottom sheet on narrow screens
+- **Loading skeletons** and empty states for first-load fetches
+
+## Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Vite dev server on `:5173` |
+| `npm run build` | Type-check (`vue-tsc`) and build for production |
+| `npm run preview` | Preview the production build |
+| `npm run typecheck` | Type-check without emitting |
+| `npm run lint` | Lint `src` |
+
+## Keyboard shortcuts
+
+| Key | Action |
+|---|---|
+| `Esc` | Close the vehicle sidebar |
+
+## Screenshots
+
+_Add dashboard / replay / geofence screenshots here._
 
 ## Project structure
 

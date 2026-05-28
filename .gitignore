@@ -9,3 +9,9 @@ coverage/
 !.vscode/extensions.json
 .idea/
 *.tsbuildinfo
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

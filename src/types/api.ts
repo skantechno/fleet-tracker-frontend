@@ -19,10 +19,11 @@ export interface Vehicle {
   id: string
   name: string
   status: VehicleStatus
-  lastLat: number
-  lastLng: number
-  lastSpeed: number
-  lastFuel: number
+  // null until the first telemetry message arrives for the vehicle
+  lastLat: number | null
+  lastLng: number | null
+  lastSpeed: number | null
+  lastFuel: number | null
   lastUpdate: string
 }
 

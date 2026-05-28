@@ -1,23 +1,36 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import FleetMap from '@/components/map/FleetMap.vue'
-import type { Vehicle } from '@/types/api'
+import { useVehiclesStore } from '@/stores/vehicles'
 
-// Placeholder fleet until Phase 4 wires the backend. Spread around Hyderabad.
-const vehicles: Vehicle[] = [
-  { id: 'v-001', name: 'Truck 01', status: 'active', lastLat: 25.41, lastLng: 68.37, lastSpeed: 52, lastFuel: 78, lastUpdate: new Date().toISOString() },
-  { id: 'v-002', name: 'Truck 02', status: 'idle', lastLat: 25.39, lastLng: 68.39, lastSpeed: 0, lastFuel: 45, lastUpdate: new Date().toISOString() },
-  { id: 'v-003', name: 'Truck 03', status: 'offline', lastLat: 25.37, lastLng: 68.35, lastSpeed: 0, lastFuel: 12, lastUpdate: new Date().toISOString() },
-  { id: 'v-004', name: 'Truck 04', status: 'maintenance', lastLat: 25.40, lastLng: 68.34, lastSpeed: 0, lastFuel: 90, lastUpdate: new Date().toISOString() },
-  { id: 'v-005', name: 'Truck 05', status: 'active', lastLat: 25.38, lastLng: 68.40, lastSpeed: 37, lastFuel: 63, lastUpdate: new Date().toISOString() },
-]
+const vehicles = useVehiclesStore()
+const { positioned, loading, error } = storeToRefs(vehicles)
+
+onMounted(() => {
+  vehicles.fetchAll()
+})
 </script>
 
 <template>
   <div class="flex h-screen flex-col bg-surface-950">
     <AppHeader />
-    <main class="min-h-0 flex-1">
-      <FleetMap :vehicles="vehicles" />
+    <main class="relative min-h-0 flex-1">
+      <FleetMap :vehicles="positioned" />
+
+      <div
+        v-if="loading"
+        class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-surface-900/90 px-4 py-1.5 text-sm text-surface-300 shadow"
+      >
+        Loading fleet…
+      </div>
+      <div
+        v-else-if="error"
+        class="absolute left-1/2 top-4 z-1000 -translate-x-1/2 rounded-full bg-red-900/90 px-4 py-1.5 text-sm text-red-100 shadow"
+      >
+        {{ error }}
+      </div>
     </main>
   </div>
 </template>

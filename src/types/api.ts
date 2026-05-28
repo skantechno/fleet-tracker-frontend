@@ -13,6 +13,19 @@ export interface LoginResponse {
   user: User
 }
 
+export type VehicleStatus = 'active' | 'idle' | 'offline' | 'maintenance'
+
+export interface Vehicle {
+  id: string
+  name: string
+  status: VehicleStatus
+  lastLat: number
+  lastLng: number
+  lastSpeed: number
+  lastFuel: number
+  lastUpdate: string
+}
+
 // --- Response envelope (API_CONTRACT.md §0) ---
 
 export interface PaginationMeta {

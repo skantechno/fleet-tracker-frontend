@@ -1,14 +1,29 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter, RouterLink, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import Button from 'primevue/button'
 import ConnectionBadge from '@/components/layout/ConnectionBadge.vue'
+import AlertList from '@/components/alerts/AlertList.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useAlertsStore } from '@/stores/alerts'
+import type { Alert } from '@/types/api'
+
+const emit = defineEmits<{ alertSelect: [alert: Alert] }>()
 
 const auth = useAuthStore()
 const { user, isAdmin } = storeToRefs(auth)
+const alerts = useAlertsStore()
+const { unacknowledgedCount } = storeToRefs(alerts)
 const router = useRouter()
 const route = useRoute()
+
+const showAlerts = ref(false)
+
+function onAlertSelect(alert: Alert) {
+  showAlerts.value = false
+  emit('alertSelect', alert)
+}
 
 function logout() {
   auth.logout()
@@ -49,6 +64,26 @@ function logout() {
       <slot name="connection">
         <ConnectionBadge />
       </slot>
+
+      <div class="relative">
+        <Button
+          icon="pi pi-bell"
+          severity="secondary"
+          text
+          rounded
+          :badge="unacknowledgedCount > 0 ? String(unacknowledgedCount) : undefined"
+          badge-severity="danger"
+          aria-label="Alerts"
+          title="Alerts"
+          @click="showAlerts = !showAlerts"
+        />
+        <template v-if="showAlerts">
+          <div class="fixed inset-0 z-1000" @click="showAlerts = false" />
+          <div class="absolute right-0 top-full z-1000 mt-2">
+            <AlertList @select="onAlertSelect" />
+          </div>
+        </template>
+      </div>
 
       <div v-if="user" class="flex items-center gap-3">
         <div class="text-right leading-tight">

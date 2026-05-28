@@ -1,11 +1,27 @@
 <script setup lang="ts">
 import 'leaflet/dist/leaflet.css'
-import { LMap, LTileLayer } from '@vue-leaflet/vue-leaflet'
+import {
+  LMap,
+  LTileLayer,
+  LPolyline,
+  LCircleMarker,
+} from '@vue-leaflet/vue-leaflet'
 import VehicleMarker from '@/components/map/VehicleMarker.vue'
 import type { Vehicle } from '@/types/api'
-import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from '@/utils/geo'
+import {
+  DEFAULT_MAP_CENTER,
+  DEFAULT_MAP_ZOOM,
+  type LatLngTuple,
+} from '@/utils/geo'
 
-defineProps<{ vehicles: Vehicle[] }>()
+withDefaults(
+  defineProps<{
+    vehicles: Vehicle[]
+    trail?: LatLngTuple[]
+    replayPosition?: LatLngTuple | null
+  }>(),
+  { trail: () => [], replayPosition: null },
+)
 
 const emit = defineEmits<{
   select: [vehicle: Vehicle]
@@ -33,6 +49,23 @@ const emit = defineEmits<{
         :key="vehicle.id"
         :vehicle="vehicle"
         @select="emit('select', $event)"
+      />
+
+      <LPolyline
+        v-if="trail.length > 1"
+        :lat-lngs="trail"
+        color="#60a5fa"
+        :weight="3"
+        :opacity="0.7"
+      />
+      <LCircleMarker
+        v-if="replayPosition"
+        :lat-lng="replayPosition"
+        :radius="8"
+        color="#ffffff"
+        :weight="2"
+        fill-color="#60a5fa"
+        :fill-opacity="1"
       />
     </LMap>
   </div>

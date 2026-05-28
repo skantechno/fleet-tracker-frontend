@@ -13,6 +13,14 @@ export interface LoginResponse {
   user: User
 }
 
+export interface HistoryPoint {
+  timestamp: string
+  lat: number
+  lng: number
+  speed: number
+  fuel: number
+}
+
 export type VehicleStatus = 'active' | 'idle' | 'offline' | 'maintenance'
 
 export interface Vehicle {

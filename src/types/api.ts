@@ -13,6 +13,24 @@ export interface LoginResponse {
   user: User
 }
 
+export type AlertType =
+  | 'speed_violation'
+  | 'geofence_exit'
+  | 'low_fuel'
+  | 'offline'
+
+export type AlertSeverity = 'low' | 'medium' | 'high'
+
+export interface Alert {
+  id: string
+  vehicleId: string
+  type: AlertType
+  message: string
+  severity: AlertSeverity
+  timestamp: string
+  acknowledged: boolean
+}
+
 export interface HistoryPoint {
   timestamp: string
   lat: number
